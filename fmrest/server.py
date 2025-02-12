@@ -232,7 +232,8 @@ class Server(object):
     def create_record(self, field_data: Dict[str, Any],
                       portals: Optional[Dict[str, Any]] = None,
                       scripts: Optional[Dict[str, List]] = None,
-                      request_layout: Optional[str] = None) -> Optional[int]:
+                      request_layout: Optional[str] = None,
+                      return_script_result: bool = False) -> Optional[Union[int, str]]:
         """Creates a new record with given field data and returns new internal record id.
 
         Parameters
@@ -269,8 +270,12 @@ class Server(object):
 
         response = self._call_filemaker('POST', path, request_data)
         record_id = response.get('recordId')
+        script_result = response.get('scriptResult')
 
-        return int(record_id) if record_id else None
+        if return_script_result:
+            return script_result
+        else:
+            return int(record_id) if record_id else None
 
     def edit(self, record: Record, validate_mod_id: bool = False,
              request_layout: Optional[str] = None) -> bool:
